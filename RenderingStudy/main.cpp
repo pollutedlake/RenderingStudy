@@ -2,6 +2,7 @@
 
 #include <Support/WinInclude.h>
 #include <Support/ComPointer.h>
+#include <Support/Window.h>
 
 #include <Debug/DXDebugLayer.h>
 
@@ -10,9 +11,21 @@
 int main()
                                                                                         {
 	DXDebugLayer::Get().Init();
-	if (DXContext::Get().Init())
+	if (DXContext::Get().Init() && DXWindow::Get().Init())
 	{
-		DXContext::Get().GetDevice();
+		while (!DXWindow::Get().ShouldClose())
+		{
+			DXWindow::Get().Update();
+			auto* cmdList = DXContext::Get().InitCommandList();
+
+			// a lot of setup
+			// a draw
+
+			DXContext::Get().ExecuteCommandList();
+
+			// Show me the stuff
+		}
+		DXWindow::Get().Shutdown();
 		DXContext::Get().Shutdown();
 	}
 

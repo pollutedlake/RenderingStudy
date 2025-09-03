@@ -28,6 +28,9 @@
     <ClCompile Include="D3D\DXContext.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Support\Window.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Support\WinInclude.h">
@@ -40,6 +43,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="D3D\DXContext.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Support\Window.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
