@@ -9,9 +9,50 @@
 *
 */
 
+D3D_FEATURE_LEVEL featureLevels[] = {
+	D3D_FEATURE_LEVEL_12_1,
+	D3D_FEATURE_LEVEL_12_0,
+	D3D_FEATURE_LEVEL_11_1,
+	D3D_FEATURE_LEVEL_11_0
+};
+
 bool DXContext::Init()
 {
-	if (SUCCEEDED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_device))))
+	for(auto featureLevel : featureLevels)
+	{
+		HRESULT hardwareResult = D3D12CreateDevice(nullptr, featureLevel, IID_PPV_ARGS(&m_device));
+		if (FAILED(hardwareResult))
+		{
+			ComPointer<IDXGIFactory6> mdxgiFactory;
+			if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory))))
+			{
+				ComPointer<IDXGIAdapter1> pWarpAdapter;
+				for (UINT adapterIdx = 0; mdxgiFactory->EnumAdapters1(adapterIdx, &pWarpAdapter) != DXGI_ERROR_NOT_FOUND; ++adapterIdx)
+				{
+					DXGI_ADAPTER_DESC1 desc;
+					pWarpAdapter->GetDesc1(&desc);
+
+					// 소프트웨어 어댑터는 무시
+					if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+					{
+						continue;
+					}
+
+					if (SUCCEEDED(D3D12CreateDevice(pWarpAdapter.Get(), featureLevel, IID_PPV_ARGS(&m_device))))
+					{
+						break; // 성공
+					}
+				}
+			}
+		}
+
+		if (m_device != nullptr)
+		{
+			break;
+		}
+	}
+
+	if (m_device != nullptr)
 	{
 		D3D12_COMMAND_QUEUE_DESC cmdQueueDesc{};
 		cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
